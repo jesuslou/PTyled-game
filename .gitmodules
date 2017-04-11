@@ -1,0 +1,3 @@
+[submodule "dependencies/LouEngine"]
+	path = dependencies/LouEngine
+	url = https://github.com/jesuslou/LouEngine.git
