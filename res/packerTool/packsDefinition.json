@@ -1,0 +1,96 @@
+{
+  "resourcesRootPath": "../../res",
+  "outputDestinationPath": "../../res_output",
+  "version": 0,
+
+  "packs": [
+    {
+      "packName": "base",
+      "separatedPacks": false,
+      "sourcePaths": [
+        {
+          "path": "common/base"
+        }
+      ]
+    },
+    {
+      "packName": "level00",
+      "separatedPacks": true,
+      "sourcePaths": [
+        {
+          "path": "common/levels/level00"
+        }
+      ]
+    },
+    {
+      "packName": "level01",
+      "separatedPacks": false,
+      "sourcePaths": [
+        {
+          "path": "common/levels/level01"
+        }
+      ]
+    },
+    {
+      "packName": "partial",
+      "separatedPacks": false,
+      "sourcePaths": [
+        {
+          "path": "common/partial/json"
+        },
+        {
+          "path": "common/partial/txt"
+        }
+      ]
+    }
+  ],
+
+  "dataPackFileTypes": [
+    {
+      "extension": "txt",
+      "rule": ["python", "../../tools/packer/processingDummys/ProcessTxtFilesDummy.py", "-f", "##IN_FILE_PATH##", "-o", "##OUT_FILE_PATH##"]
+    },
+    {
+      "extension": "lua",
+      "rule": []
+    },
+    {
+      "extension": "json",
+      "rule": []
+    },
+    {
+      "extension": "xml",
+      "rule": []
+    },
+    {
+      "extension": "spine",
+      "rule": []
+    },
+    {
+      "extension": "graphml",
+      "rule": []
+    }
+  ],
+  "resourcePackFileTypes": [
+    {
+      "extension": "png",
+      "rule": []
+    },
+    {
+      "extension": "jpeg",
+      "rule": []
+    },
+    {
+      "extension": "wav",
+      "rule": []
+    },
+    {
+      "extension": "ogg",
+      "rule": []
+    },
+    {
+      "extension": "avi",
+      "rule": []
+    }
+  ]
+}
