@@ -6,6 +6,8 @@ import subprocess
 from pathlib import Path
 from time import sleep
 from appdirs import user_data_dir
+from subprocess import Popen, PIPE, STDOUT
+
 
 def message_and_die(message):
 	print('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
@@ -31,10 +33,14 @@ class PackGenerator:
 		with open(self.packs_file_path.absolute()._str) as packs_file:
 			self.packs_info = json.load(packs_file)
 
+		# packerTool path
+		self.packer_tool_path = self.__get_config_path(Path(self.packs_info["packerToolPath"]))
+
 		# resources root path. Root of ALL game resources
 		self.res_root_path = self.__get_config_path(Path(self.packs_info["resourcesRootPath"]))
 		print("-- res_root path path set to {}".format(self.res_root_path))
 
+		# output folder for generated Packs
 		self.res_output_path = self.__get_config_path(Path(self.packs_info["outputDestinationPath"]))
 		print("-- res_output path set to {}".format(self.res_output_path))
 
@@ -52,10 +58,14 @@ class PackGenerator:
 		self.res_cache_path.mkdir(parents=True, exist_ok=True)
 		print("-- res_cache_path path set to {}".format(self.res_cache_path))
 
+		# Final pack_defs.json path
+		self.final_pack_def_file_path = Path(self.res_cache_path)
+		self.final_pack_def_file_path /= "pack_defs.json"
+
 		self.files_needing_new_cache_file = []
 
 		self.__generate_pack_definitions()
-		#self.__generate_packs()
+		self.__generate_packs()
 
 		self.__update_cache_files()
 
@@ -76,7 +86,7 @@ class PackGenerator:
 
 	def __generate_pack_definitions(self):
 		print("\n-- Current packs version is {}\n".format(self.packs_info["version"]))
-		self.pack_definitions = {"version":self.packs_info["version"], "packs":[]}
+		self.pack_definitions = {"version":self.packs_info["version"], "packs":[], "outputDestinationPath":"{}".format(self.res_output_path)}
 		for pack_definition in self.packs_info["packs"]:
 			if self.__any_file_modified(pack_definition):
 				self.current_pack_definition = {}
@@ -86,9 +96,7 @@ class PackGenerator:
 				print("-- Skipping. Nothing modified in pack '{}'.".format(pack_definition["packName"]))
 
 		if len(self.pack_definitions["packs"]) > 0:
-			final_pack_def_file_path = Path(self.res_cache_path)
-			final_pack_def_file_path /= "pack_defs.json"
-			with open(str(final_pack_def_file_path), "w+") as file:
+			with open(str(self.final_pack_def_file_path.absolute()), "w+") as file:
 				json.dump(self.pack_definitions, file, indent=4)
 
 
@@ -139,12 +147,13 @@ class PackGenerator:
 
 
 	def __add_files(self, root_path):
-		self.__add_pak_specific_files(root_path, self.packs_info["dataPackFileTypes"], "dataFiles")
-		self.__add_pak_specific_files(root_path, self.packs_info["resourcePackFileTypes"], "resourceFiles")
+		self.__add_pak_specific_files(root_path, self.packs_info["dataPackFileTypes"], "sourcePaths")
+		self.__add_pak_specific_files(root_path, self.packs_info["resourcePackFileTypes"], "sourcePaths")
 
 
 	def __add_pak_specific_files(self, root_path, pack_file_types, pack_files_name):
-		self.current_pack_definition[pack_files_name] = []
+		if not pack_files_name in self.current_pack_definition:
+			self.current_pack_definition[pack_files_name] = []
 		current_pack_definition_paths = []
 		for pack_file_type in pack_file_types:
 			tmp_data_files = list(root_path.glob("**/*.{}".format(pack_file_type["extension"])))
@@ -195,6 +204,27 @@ class PackGenerator:
 			cache_file_path.parent.mkdir(parents=True, exist_ok=True)
 			cache_file_path.touch(exist_ok=True)
 			cache_file_path.write_text(str(os.path.getmtime(str(cache_file_path))))
+
+
+	def __generate_packs(self):
+		params = []
+		params.append("PackerTool.exe")
+		params.append(str(self.packs_file_path.absolute()))
+		params.append(str(self.final_pack_def_file_path.absolute()))
+
+		print("\n-- Executing: {}\n".format(" ".join(params)))
+		pipe = Popen(params, stderr=STDOUT, stdout=PIPE, shell=True, cwd=r"{}/".format(str(self.packer_tool_path.absolute())))
+		while True:
+			nextline = pipe.stdout.readline()
+			if pipe.poll() is not None:
+				break
+			if nextline:
+				line = "{}".format(nextline.strip())
+				line = line.lstrip("b'")
+				line = line.rstrip("'")
+				line = line.lstrip("\"")
+				line = line.rstrip("\"")
+				print(line)
 
 
 if __name__ == '__main__':

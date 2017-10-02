@@ -1,6 +1,7 @@
 {
   "resourcesRootPath": "../../res",
   "outputDestinationPath": "../../res_output",
+  "packerToolPath": "../../dependencies/LouEngine/tools",
   "version": 0,
 
   "packs": [
