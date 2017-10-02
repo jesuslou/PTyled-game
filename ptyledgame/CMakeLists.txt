@@ -12,4 +12,4 @@ set(dependencies
 	"LouEngine"
 )
 
-generate_game(name "PTyledGame" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}")
+generate_executable(name "PTyledGame" dependencies "${dependencies}" dependencies_folder "${dependencies_folder}")
