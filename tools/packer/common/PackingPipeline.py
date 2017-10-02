@@ -85,10 +85,11 @@ class PackGenerator:
 			else:
 				print("-- Skipping. Nothing modified in pack '{}'.".format(pack_definition["packName"]))
 
-		final_pack_def_file_path = Path(self.res_cache_path)
-		final_pack_def_file_path /= "pack_defs.json"
-		with open(str(final_pack_def_file_path), "w+") as file:
-			json.dump(self.pack_definitions, file, indent=4)
+		if len(self.pack_definitions["packs"]) > 0:
+			final_pack_def_file_path = Path(self.res_cache_path)
+			final_pack_def_file_path /= "pack_defs.json"
+			with open(str(final_pack_def_file_path), "w+") as file:
+				json.dump(self.pack_definitions, file, indent=4)
 
 
 	def __any_file_modified(self, pack_definition):
