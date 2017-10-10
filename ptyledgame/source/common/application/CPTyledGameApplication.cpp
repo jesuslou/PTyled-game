@@ -1,11 +1,6 @@
 #include <application/CPTyledGameApplication.h>
-#include <entities/CEntityManager.h>
-#include <entities/components/CComponentFactoryManager.h>
-
-#include <components/SPositionComponent.h>
-#include <components/SRotationComponent.h>
-
-#include <components/SPTyledFooComponent.h>
+#include <entity/CEntityManager.h>
+#include <handle/CHandle.h>
 
 CPTyledGameApplication::CPTyledGameApplication()
 {
@@ -13,14 +8,32 @@ CPTyledGameApplication::CPTyledGameApplication()
 
 bool CPTyledGameApplication::InitProject(CGameSystems& gameSystems)
 {
-	CEntity e = CSystems::GetSystem<CEntityManager>()->CreateNewEntity();
-	CSystems::GetSystem<CComponentFactoryManager>()->AddComponentByStr("position", e);
-	CSystems::GetSystem<CComponentFactoryManager>()->AddComponentByStr("rotation", e);
-	CSystems::GetSystem<CComponentFactoryManager>()->AddComponentByStr("foo", e);
+	CEntity *e = CSystems::GetSystem<CEntityManager>()->CreateEntity();
+	CHandle h0 = CSystems::GetSystem<CEntityManager>()->CreateEntity();
+	CHandle h1 = CSystems::GetSystem<CEntityManager>()->CreateEntity();
 
-	SPositionComponent* p1 = e.component<SPositionComponent>().get();
-	SRotationComponent* p2 = e.component<SRotationComponent>().get();
-	SPTyledFooComponent* p3 = e.component<SPTyledFooComponent>().get();
+	CHandle h = e;
+
+	if (h0)
+	{
+		printf("h0");
+	}
+
+	if (h1)
+	{
+		printf("h0");
+	}
+
+	CEntity* e2 = h;
+	CEntity* e3 = h1;
+
+	CSystems::GetSystem<CEntityManager>()->DestroyEntity(e);
+	if (h)
+	{
+		printf("h0");
+	}
+	e = CSystems::GetSystem<CEntityManager>()->CreateEntity();
+
 
 	(void)gameSystems;
 	return true;
@@ -37,5 +50,4 @@ void CPTyledGameApplication::DestroyProject()
 
 void CPTyledGameApplication::RegisterComponentsProject()
 {
-	REGISTER_COMPONENT_FACTORY("foo", SPTyledFooComponent);
 }
