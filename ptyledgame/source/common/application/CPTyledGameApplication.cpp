@@ -1,6 +1,19 @@
 #include <application/CPTyledGameApplication.h>
 #include <entity/CEntityManager.h>
 #include <handle/CHandle.h>
+#include <component/CComponent.h>
+#include <component/CComponentFactory.h>
+#include <component/CComponentFactoryManager.h>
+
+#include <components/CCompLocation.h>
+#include <components/CCompCamera.h>
+
+class CCompFoo : public CComponent
+{
+public:
+	CCompFoo() : m_p(10) {}
+	int m_p;
+};
 
 CPTyledGameApplication::CPTyledGameApplication()
 {
@@ -8,32 +21,24 @@ CPTyledGameApplication::CPTyledGameApplication()
 
 bool CPTyledGameApplication::InitProject(CGameSystems& gameSystems)
 {
-	CEntity *e = CSystems::GetSystem<CEntityManager>()->CreateEntity();
-	CHandle h0 = CSystems::GetSystem<CEntityManager>()->CreateEntity();
-	CHandle h1 = CSystems::GetSystem<CEntityManager>()->CreateEntity();
+	CComponentFactoryManager* cfm = CSystems::GetSystem<CComponentFactoryManager>();
 
-	CHandle h = e;
+	ADD_COMPONENT_FACTORY("loc", CCompLocation, 2);
+	ADD_COMPONENT_FACTORY("cam", CCompCamera, 2);
 
-	if (h0)
-	{
-		printf("h0");
-	}
+	CCompLocation* compLoc = static_cast<CCompLocation*>(cfm->CreateComponent<CCompLocation>());
+	CCompCamera* compCam = static_cast<CCompCamera*>(cfm->CreateComponent<CCompCamera>());
 
-	if (h1)
-	{
-		printf("h0");
-	}
+	CHandle h = cfm->CreateComponent<CCompCamera>();
 
-	CEntity* e2 = h;
-	CEntity* e3 = h1;
+	CHandle compCamHandle;
+	compCamHandle.m_elementType = CHandle::EElementType::Component;
+	compCamHandle.m_componentIdx = 1;
+	compCamHandle.m_elementPosition = 0;
+	compCamHandle.m_version = 0;
 
-	CSystems::GetSystem<CEntityManager>()->DestroyEntity(e);
-	if (h)
-	{
-		printf("h0");
-	}
-	e = CSystems::GetSystem<CEntityManager>()->CreateEntity();
-
+	CComponent* compCam33 = h;
+	CComponent* compCam2 = compCamHandle;
 
 	(void)gameSystems;
 	return true;
